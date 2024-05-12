@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  
+  db:
+    container_name: db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 7777777
+    ports:
+      - 5432:5432
+    volumes:
+      - ./server/migrations/migrations_up.sql:/docker-entrypoint-initdb.d/migrations_up.sql
+      - ./data:/var/lib/postgresql/data
+    networks:
+     - appnetwork
+
+  product_service:
+    container_name: server
+    build: server/
+    networks:
+      - appnetwork
+    depends_on:
+      - db
+
+  api_service:
+    container_name: client
+    build: client/
+    networks:
+      - appnetwork
+    ports:
+      - 8080:8080
+    depends_on:
+      - product_service
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - /etc/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  appnetwork:
+    driver: bridge

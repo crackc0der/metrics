@@ -1,0 +1,2 @@
+httpPort: ":8080"
+grpcServerAddress: "product_service:50051"

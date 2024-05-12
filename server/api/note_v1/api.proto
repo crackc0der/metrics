@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package server;
+
+option go_package = "github.com/crackc0der/product_grpc";
+
+service Product {
+    rpc GetProduct(ProductRequest) returns (ProductMessage);
+    rpc GetProducts(google.protobuf.Empty) returns (AllProductMessage);
+    rpc AddProduct(ProductMessage) returns (ProductMessage);
+    rpc UpdateProduct(ProductMessage) returns (ProductMessage);
+    rpc DeleteProduct(ProductRequest) returns (ProductResponse);
+}
+
+service Category {
+    rpc GetCategories(google.protobuf.Empty) returns (AllCategoryMessage);
+    rpc AddCategory(CategoryMessage) returns (CategoryMessage);
+    rpc UpdateCategory(CategoryMessage) returns (CategoryMessage);
+    rpc DeleteCategory(CategoryRequest) returns (CategoryResponse);
+}
+
+message ProductMessage {
+    int64 Id = 1;
+    string ProductName = 2;
+    int64 ProductCategoryID = 3;
+    double ProductPrice = 4;
+}
+
+message AllProductMessage {
+    repeated ProductMessage Products = 1;
+}
+
+message ProductRequest {
+    int64 Id = 1;
+}
+
+message ProductResponse {
+    bool Deleted = 1;
+}
+
+message CategoryMessage {
+    int64 Id = 1;
+    string CategoryName = 2;
+}
+
+message CategoryRequest {
+    int64 Id = 1;
+}
+
+message AllCategoryMessage {
+    repeated CategoryMessage Categories = 1;
+}
+
+message CategoryResponse {
+    bool Deleted = 1;
+}
